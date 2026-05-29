@@ -1,17 +1,13 @@
-```jsx
 import { useEffect, useState } from "react";
 import {
   getTickets,
   createTicket,
   deleteTicket,
-  updateTicket,
 } from "./api/tickets";
 
 function App() {
   const [tickets, setTickets] = useState([]);
   const [search, setSearch] = useState("");
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState(null);
 
   const [formData, setFormData] = useState({
     customer_name: "",
@@ -29,8 +25,8 @@ function App() {
     try {
       const res = await getTickets();
       setTickets(res.data);
-    } catch (error) {
-      console.error("Error fetching tickets:", error);
+    } catch (err) {
+      console.error("Error fetching tickets:", err);
     }
   };
 
@@ -68,8 +64,9 @@ function App() {
       });
 
       fetchTickets();
-    } catch (error) {
-      console.error("Error creating ticket:", error);
+
+    } catch (err) {
+      console.error("Create ticket error:", err);
     }
   };
 
@@ -81,39 +78,19 @@ function App() {
     try {
       await deleteTicket(id);
       fetchTickets();
-    } catch (error) {
-      console.error("Error deleting ticket:", error);
+    } catch (err) {
+      console.error("Delete error:", err);
     }
   };
 
   // =========================
-  // TOGGLE STATUS
-  // =========================
-
-  const toggleStatus = async (ticket) => {
-    try {
-      await updateTicket(ticket.id, {
-        ...ticket,
-        status: ticket.status === "open" ? "closed" : "open",
-      });
-
-      fetchTickets();
-    } catch (error) {
-      console.error("Error updating ticket:", error);
-    }
-  };
-
-  // =========================
-  // FILTER TICKETS
+  // SEARCH FILTER
   // =========================
 
   const filteredTickets = tickets.filter((ticket) => {
-    const subject = ticket.subject || "";
-    const customer = ticket.customer_name || "";
-
     return (
-      subject.toLowerCase().includes(search.toLowerCase()) ||
-      customer.toLowerCase().includes(search.toLowerCase())
+      ticket.subject?.toLowerCase().includes(search.toLowerCase()) ||
+      ticket.customer_name?.toLowerCase().includes(search.toLowerCase())
     );
   });
 
@@ -122,69 +99,42 @@ function App() {
 
       {/* ================= HEADER ================= */}
 
-      <div className="relative flex items-center justify-between px-6 py-4 border-b border-white/10">
+      <div className="border-b border-white/10 px-6 py-5 flex items-center justify-center">
 
-        <div className="w-10"></div>
-
-        <h1 className="absolute left-1/2 -translate-x-1/2 text-2xl font-semibold tracking-wide text-white/90">
+        <h1 className="text-3xl font-bold tracking-wide">
           Support CRM
         </h1>
 
-        <button
-          onClick={() => setSearchOpen(true)}
-          className="group relative w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 transition"
-        >
-          <span className="absolute inset-0 rounded-full bg-blue-500/10 opacity-0 group-hover:opacity-100 transition" />
-
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-5 h-5 text-white/70 group-hover:text-white transition"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-            />
-          </svg>
-        </button>
       </div>
 
-      {/* ================= SEARCH MODAL ================= */}
+      {/* ================= MAIN ================= */}
 
-      {searchOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="max-w-5xl mx-auto p-6">
 
-          <div
-            onClick={() => setSearchOpen(false)}
-            className="absolute inset-0 bg-black/70 backdrop-blur-md"
-          />
+        {/* ================= SEARCH ================= */}
+
+        <div className="mb-6">
 
           <input
-            autoFocus
+            type="text"
             placeholder="Search tickets..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="z-10 w-[420px] rounded-xl border border-white/10 bg-[#111827] p-4 text-lg outline-none"
+            className="w-full p-4 rounded-xl bg-[#111827] border border-white/10 outline-none text-white"
           />
+
         </div>
-      )}
-
-      {/* ================= MAIN CONTENT ================= */}
-
-      <div className="p-6 max-w-6xl mx-auto">
 
         {/* ================= FORM ================= */}
 
         <form
-          className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 backdrop-blur-lg"
           onSubmit={handleSubmit}
+          className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 backdrop-blur-lg"
         >
 
           <div className="grid md:grid-cols-2 gap-4">
+
+            {/* CUSTOMER NAME */}
 
             <input
               type="text"
@@ -192,9 +142,11 @@ function App() {
               placeholder="Customer Name"
               value={formData.customer_name}
               onChange={handleChange}
-              className="p-3 rounded-lg bg-black/30 border border-white/10 outline-none"
+              className="p-3 rounded-lg bg-[#111827] border border-white/10 outline-none"
               required
             />
+
+            {/* CUSTOMER EMAIL */}
 
             <input
               type="email"
@@ -202,9 +154,11 @@ function App() {
               placeholder="Customer Email"
               value={formData.customer_email}
               onChange={handleChange}
-              className="p-3 rounded-lg bg-black/30 border border-white/10 outline-none"
+              className="p-3 rounded-lg bg-[#111827] border border-white/10 outline-none"
               required
             />
+
+            {/* SUBJECT */}
 
             <input
               type="text"
@@ -212,38 +166,101 @@ function App() {
               placeholder="Subject"
               value={formData.subject}
               onChange={handleChange}
-              className="p-3 rounded-lg bg-black/30 border border-white/10 outline-none"
+              className="p-3 rounded-lg bg-[#111827] border border-white/10 outline-none"
               required
             />
 
-            <select
-              name="priority"
-              value={formData.priority}
-              onChange={handleChange}
-              className="p-3 rounded-lg bg-black/30 border border-white/10 outline-none"
-            >
-              <option value="low">Low Priority</option>
-              <option value="medium">Medium Priority</option>
-              <option value="high">High Priority</option>
-            </select>
+            {/* PRIORITY */}
+
+            <div className="relative">
+
+              <select
+                name="priority"
+                value={formData.priority}
+                onChange={handleChange}
+                className="
+                  w-full
+                  p-3
+                  rounded-lg
+                  bg-[#111827]
+                  border
+                  border-white/10
+                  text-white
+                  outline-none
+                  appearance-none
+                  pr-10
+                "
+              >
+
+                <option
+                  className="bg-[#111827] text-white"
+                  value="low"
+                >
+                  Low Priority
+                </option>
+
+                <option
+                  className="bg-[#111827] text-white"
+                  value="medium"
+                >
+                  Medium Priority
+                </option>
+
+                <option
+                  className="bg-[#111827] text-white"
+                  value="high"
+                >
+                  High Priority
+                </option>
+
+              </select>
+
+              {/* DROPDOWN ICON */}
+
+              <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-white/70">
+
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+
+              </div>
+
+            </div>
+
           </div>
+
+          {/* DESCRIPTION */}
 
           <textarea
             name="description"
             placeholder="Ticket Description"
             value={formData.description}
             onChange={handleChange}
-            rows="4"
-            className="w-full mt-4 p-3 rounded-lg bg-black/30 border border-white/10 outline-none"
+            rows="5"
+            className="w-full mt-4 p-3 rounded-lg bg-[#111827] border border-white/10 outline-none"
             required
           />
 
+          {/* BUTTON */}
+
           <button
             type="submit"
-            className="mt-5 px-5 py-3 rounded-xl bg-white text-black font-medium hover:opacity-90 transition"
+            className="mt-5 px-6 py-3 rounded-xl bg-white text-black font-semibold hover:opacity-90 transition"
           >
             Create Ticket
           </button>
+
         </form>
 
         {/* ================= TICKET LIST ================= */}
@@ -251,6 +268,7 @@ function App() {
         <div className="grid gap-5">
 
           {filteredTickets.map((ticket) => (
+
             <div
               key={ticket.id}
               className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-lg"
@@ -258,11 +276,9 @@ function App() {
 
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
 
-                <div
-                  className="cursor-pointer"
-                  onClick={() => setSelectedTicket(ticket)}
-                >
-                  <h2 className="text-xl font-semibold text-white/90">
+                <div>
+
+                  <h2 className="text-2xl font-semibold text-white/90">
                     {ticket.subject}
                   </h2>
 
@@ -273,73 +289,45 @@ function App() {
                   <p className="text-white/40 text-sm">
                     {ticket.customer_email}
                   </p>
+
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex items-center gap-3">
 
-                  <button
-                    onClick={() => toggleStatus(ticket)}
-                    className="px-4 py-2 rounded-full text-sm bg-blue-500/20 border border-blue-400/20"
-                  >
+                  <div className="px-4 py-2 rounded-full bg-blue-500/20 border border-blue-400/20 text-sm">
+
                     {ticket.status}
-                  </button>
+
+                  </div>
 
                   <button
                     onClick={() => handleDelete(ticket.id)}
-                    className="px-4 py-2 rounded-full text-sm bg-red-500/20 border border-red-400/20"
+                    className="px-4 py-2 rounded-full bg-red-500/20 border border-red-400/20 text-sm hover:bg-red-500/30 transition"
                   >
                     Delete
                   </button>
+
                 </div>
+
               </div>
 
               <p className="mt-5 text-white/70 leading-relaxed">
+
                 {ticket.description}
+
               </p>
+
             </div>
+
           ))}
+
         </div>
+
       </div>
 
-      {/* ================= TICKET MODAL ================= */}
-
-      {selectedTicket && (
-        <div
-          onClick={() => setSelectedTicket(null)}
-          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-lg bg-[#111827] border border-white/10 rounded-2xl p-6"
-          >
-            <h2 className="text-2xl font-semibold mb-3">
-              {selectedTicket.subject}
-            </h2>
-
-            <p className="text-white/60 mb-2">
-              {selectedTicket.customer_name}
-            </p>
-
-            <p className="text-white/40 text-sm mb-6">
-              {selectedTicket.customer_email}
-            </p>
-
-            <p className="text-white/70 leading-relaxed">
-              {selectedTicket.description}
-            </p>
-
-            <button
-              onClick={() => setSelectedTicket(null)}
-              className="mt-6 px-4 py-2 rounded-lg bg-white text-black"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
 export default App;
-```
+
