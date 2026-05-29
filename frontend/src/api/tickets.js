@@ -1,15 +1,33 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://127.0.0.1:8000/api/tickets",
+  baseURL: "https://support-crm-backend-b82w.onrender.com",
 });
 
-export const getTickets = () => API.get("/");
+// ======================
+// GET TICKETS
+// ======================
 
-export const createTicket = (data) => API.post("/", data);
+export const getTickets = () => API.get("/tickets/");
+
+// ======================
+// CREATE TICKET
+// ======================
+
+export const createTicket = (data) =>
+  API.post("/tickets/", data);
+
+// ======================
+// UPDATE TICKET
+// ======================
 
 export const updateTicket = (id, data) =>
-  API.put(`/${id}/`, data);
+  API.put(`/tickets/${id}/`, data);
+
+// ======================
+// DELETE TICKET
+// ======================
 
 export const deleteTicket = (id) =>
-  API.delete(`/${id}/`);
+  API.delete(`/tickets/${id}/`);
+
