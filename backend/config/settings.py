@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import os
 import dj_database_url
@@ -20,10 +19,11 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = os.environ.get(
-    "ALLOWED_HOSTS",
-    "127.0.0.1,localhost,.onrender.com"
-).split(",")
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    ".onrender.com",
+]
 
 # ==========================================
 # INSTALLED APPS
@@ -37,11 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Third Party Apps
+    # THIRD PARTY APPS
     'rest_framework',
     'corsheaders',
 
-    # Local Apps
+    # LOCAL APPS
     'tickets',
 ]
 
@@ -52,7 +52,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
-    # WhiteNoise
+    # WHITENOISE
     'whitenoise.middleware.WhiteNoiseMiddleware',
 
     # CORS
@@ -147,7 +147,7 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ==========================================
 # DEFAULT PRIMARY KEY
@@ -159,19 +159,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CORS SETTINGS
 # ==========================================
 
-CORS_ALLOWED_ORIGINS = os.environ.get(
-    "CORS_ALLOWED_ORIGINS",
-    "http://localhost:5173"
-).split(",")
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://support-crm-theta.vercel.app",
+]
 
 # ==========================================
 # CSRF SETTINGS
 # ==========================================
 
-CSRF_TRUSTED_ORIGINS = os.environ.get(
-    "CSRF_TRUSTED_ORIGINS",
-    "https://*.onrender.com"
-).split(",")
+CSRF_TRUSTED_ORIGINS = [
+    "https://support-crm-theta.vercel.app",
+]
 
 # ==========================================
 # DJANGO REST FRAMEWORK
